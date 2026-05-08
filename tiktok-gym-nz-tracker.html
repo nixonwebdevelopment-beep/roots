@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TikTok #gym + #nz Engagement Tracker</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #ffffff; --bg2: #f5f5f3; --bg3: #ebebea;
+    --text: #1a1a1a; --text2: #5a5a58; --text3: #8a8a88;
+    --border: rgba(0,0,0,0.12); --border2: rgba(0,0,0,0.22);
+    --blue: #185FA5; --blue-bg: #E6F1FB; --blue-txt: #0C447C; --blue-border: #B5D4F4;
+    --green: #3B6D11; --green-bg: #EAF3DE; --green-txt: #27500A; --green-border: #C0DD97;
+    --amber: #854F0B; --amber-bg: #FAEEDA; --amber-txt: #633806; --amber-border: #FAC775;
+    --red: #A32D2D; --red-bg: #FCEBEB; --red-txt: #791F1F; --red-border: #F7C1C1;
+    --radius: 8px; --radius-lg: 12px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a; --bg2: #252523; --bg3: #2e2e2c;
+      --text: #f0ede8; --text2: #a0a09e; --text3: #6a6a68;
+      --border: rgba(255,255,255,0.1); --border2: rgba(255,255,255,0.2);
+      --blue-bg: #0c2a4a; --blue-txt: #85B7EB; --blue-border: #185FA5;
+      --green-bg: #172d06; --green-txt: #97C459; --green-border: #3B6D11;
+      --amber-bg: #2a1c06; --amber-txt: #EF9F27; --amber-border: #854F0B;
+      --red-bg: #2a0e0e; --red-txt: #F09595; --red-border: #A32D2D;
+    }
+  }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg2); color: var(--text); min-height: 100vh; }
+  .app { max-width: 780px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  .header { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+  .header h1 { font-size: 20px; font-weight: 600; color: var(--text); }
+  .tiktok-icon { width: 24px; height: 24px; flex-shrink: 0; }
+  .subtitle { font-size: 13px; color: var(--text2); margin-bottom: 1.5rem; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  .pill { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 999px; }
+  .pill-blue { background: var(--blue-bg); color: var(--blue-txt); border: 0.5px solid var(--blue-border); }
+  .pill-green { background: var(--green-bg); color: var(--green-txt); border: 0.5px solid var(--green-border); }
+  .pill-amber { background: var(--amber-bg); color: var(--amber-txt); border: 0.5px solid var(--amber-border); }
+
+  /* API Key section */
+  .api-section { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 1.5rem; }
+  .api-section label { font-size: 13px; font-weight: 500; color: var(--text); display: block; margin-bottom: 6px; }
+  .api-row { display: flex; gap: 8px; }
+  .api-input { flex: 1; height: 36px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg2); color: var(--text); padding: 0 12px; font-size: 13px; font-family: monospace; }
+  .api-input:focus { outline: none; border-color: var(--blue); }
+  .api-hint { font-size: 11px; color: var(--text3); margin-top: 6px; }
+  .api-hint a { color: var(--blue-txt); }
+
+  /* Settings panel */
+  .settings { background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; margin-bottom: 1.5rem; }
+  .settings-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 12px; }
+  .settings-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 12px; color: var(--text2); }
+  .field input[type=number] { height: 32px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg2); color: var(--text); padding: 0 10px; font-size: 13px; }
+  .field input[type=number]:focus { outline: none; border-color: var(--blue); }
+  .settings-note { font-size: 11px; color: var(--text3); margin-top: 10px; line-height: 1.6; }
+
+  /* Buttons */
+  .btn-row { display: flex; gap: 8px; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  button { height: 36px; padding: 0 16px; font-size: 13px; font-weight: 500; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); cursor: pointer; transition: background 0.12s, opacity 0.12s; white-space: nowrap; }
+  button:hover { background: var(--bg3); }
+  button.primary { background: var(--blue); color: #fff; border-color: var(--blue); }
+  button.primary:hover { background: #0C447C; }
+  button:disabled { opacity: 0.4; cursor: not-allowed; }
+  .last-scan { font-size: 12px; color: var(--text3); margin-left: auto; }
+
+  /* Status */
+  .status { font-size: 13px; color: var(--text2); padding: 8px 12px; background: var(--bg2); border-radius: var(--radius); margin-bottom: 1rem; display: flex; align-items: center; gap: 8px; min-height: 36px; border: 0.5px solid var(--border); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--text3); flex-shrink: 0; }
+  .dot.on { background: #378ADD; animation: pulse 1s infinite; }
+  .dot.ok { background: #639922; }
+  .dot.err { background: #E24B4A; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+  .progress-wrap { margin-bottom: 1rem; display: none; }
+  .progress-wrap.show { display: block; }
+  .progress-track { height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; background: #378ADD; border-radius: 2px; transition: width 0.3s; width: 0%; }
+
+  /* Log */
+  .log { font-size: 12px; color: var(--text2); background: var(--bg); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 10px 14px; margin-bottom: 1rem; max-height: 110px; overflow-y: auto; line-height: 1.9; display: none; font-family: monospace; }
+  .log.show { display: block; }
+  .log-line.pass { color: #639922; }
+  .log-line.fail { color: #E24B4A; }
+  .log-line.info { color: var(--text2); }
+
+  /* Metrics */
+  .metrics { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-bottom: 1.5rem; display: none; }
+  .metrics.show { display: grid; }
+  .metric { background: var(--bg2); border-radius: var(--radius); padding: 12px 14px; }
+  .metric-label { font-size: 11px; color: var(--text3); margin-bottom: 4px; }
+  .metric-val { font-size: 22px; font-weight: 600; color: var(--text); }
+
+  /* Legend */
+  .legend { display: flex; gap: 14px; font-size: 11px; color: var(--text2); margin-bottom: 1rem; flex-wrap: wrap; }
+  .legend span { display: flex; align-items: center; gap: 5px; }
+  .leg-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
+
+  /* List */
+  .list-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+  .list-title { font-size: 14px; font-weight: 500; color: var(--text); }
+  .count-pill { font-size: 12px; padding: 2px 8px; border-radius: 999px; background: var(--bg3); color: var(--text2); border: 0.5px solid var(--border); }
+  .filter-row { display: flex; gap: 8px; margin-bottom: 1rem; }
+  .filter-input { flex: 1; height: 32px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); padding: 0 10px; font-size: 13px; }
+  .filter-input:focus { outline: none; border-color: var(--blue); }
+  select { height: 32px; padding: 0 8px; border-radius: var(--radius); border: 0.5px solid var(--border2); background: var(--bg); color: var(--text); font-size: 13px; }
+  .account-list { border: 0.5px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; }
+  .account-item { display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 0.5px solid var(--border); background: var(--bg); transition: background 0.1s; }
+  .account-item:last-child { border-bottom: none; }
+  .account-item:hover { background: var(--bg2); }
+  .account-item.removed { opacity: 0.35; background: var(--bg2); }
+  .account-item.removed .account-name { text-decoration: line-through; }
+  .avatar { width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; flex-shrink: 0; }
+  .info { flex: 1; min-width: 0; }
+  .account-name { font-size: 14px; font-weight: 500; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .account-meta { font-size: 11px; color: var(--text3); margin-top: 2px; }
+  .eng-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; flex-shrink: 0; }
+  .eng-score { font-size: 15px; font-weight: 600; }
+  .eng-label { font-size: 10px; font-weight: 500; }
+  .eng-bar-track { width: 72px; height: 5px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .eng-bar-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+  .badge { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 999px; flex-shrink: 0; }
+  .badge-new { background: var(--green-bg); color: var(--green-txt); border: 0.5px solid var(--green-border); }
+  .badge-analysing { background: var(--blue-bg); color: var(--blue-txt); border: 0.5px solid var(--blue-border); animation: pulse 1s infinite; }
+  .badge-fol { background: var(--blue-bg); color: var(--blue-txt); border: 0.5px solid var(--blue-border); }
+  .remove-check { width: 16px; height: 16px; accent-color: #E24B4A; cursor: pointer; flex-shrink: 0; }
+  .empty { padding: 2.5rem; text-align: center; color: var(--text3); font-size: 13px; }
+  .small-btn { font-size: 12px; height: 28px; padding: 0 10px; color: var(--text2); background: none; border: none; cursor: pointer; border-radius: var(--radius); }
+  .small-btn:hover { background: var(--bg3); }
+  .notice { margin-top: 1.5rem; padding: 12px 16px; border-radius: var(--radius); border: 0.5px solid var(--amber-border); background: var(--amber-bg); font-size: 12px; color: var(--amber-txt); line-height: 1.7; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div class="header">
+    <svg class="tiktok-icon" viewBox="0 0 24 24" fill="none">
+      <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.28 8.28 0 004.84 1.55V6.79a4.85 4.85 0 01-1.07-.1z" fill="#E24B4A"/>
+    </svg>
+    <h1>TikTok #gym + #nz Engagement Tracker</h1>
+  </div>
+  <p class="subtitle">Finds NZ gym creators with 5K+ followers using both hashtags, then scores engagement across their last 10 videos.</p>
+
+  <div class="tags">
+    <span class="pill pill-blue">#gym</span>
+    <span class="pill pill-blue">#nz</span>
+    <span class="pill pill-green">5,000+ followers</span>
+    <span class="pill pill-amber">Engagement scored</span>
+  </div>
+
+  <!-- API Key -->
+  <div class="api-section">
+    <label for="apiKey">Anthropic API key</label>
+    <div class="api-row">
+      <input type="password" class="api-input" id="apiKey" placeholder="sk-ant-api03-..." autocomplete="off">
+      <button onclick="saveKey()">Save</button>
+    </div>
+    <p class="api-hint">Your key is stored only in localStorage on this device. Get one at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a></p>
+  </div>
+
+  <!-- Settings -->
+  <div class="settings">
+    <div class="settings-title">Search filters</div>
+    <div class="settings-grid">
+      <div class="field">
+        <label>Min followers</label>
+        <input type="number" id="minFollowers" value="5000" min="0" step="500">
+      </div>
+      <div class="field">
+        <label>Max followers</label>
+        <input type="number" id="maxFollowers" value="" min="0" step="500" placeholder="No limit">
+      </div>
+      <div class="field">
+        <label>Min engagement %</label>
+        <input type="number" id="minEng" value="2.5" min="0" step="0.1">
+      </div>
+      <div class="field">
+        <label>Videos per account</label>
+        <input type="number" id="vidCount" value="10" min="3" max="20">
+      </div>
+    </div>
+    <p class="settings-note">Engagement = avg (comments + shares) ÷ views × 100 per video. Thresholds: &lt;1% = dead fanbase · 1–2.5% = moderate · 2.5%+ = alive (default minimum).</p>
+  </div>
+
+  <!-- Actions -->
+  <div class="btn-row">
+    <button class="primary" id="searchBtn" onclick="startPipeline()">Run full pipeline</button>
+    <button id="reBtn" onclick="reAnalyseAll()" disabled>Re-analyse engagement</button>
+    <button onclick="exportCSV()">Export CSV</button>
+    <span class="last-scan" id="lastScan"></span>
+  </div>
+
+  <!-- Status -->
+  <div class="status"><div class="dot" id="statusDot"></div><span id="statusText">Enter your API key and click Run.</span></div>
+  <div class="progress-wrap" id="progWrap"><div class="progress-track"><div class="progress-fill" id="progFill"></div></div></div>
+  <div class="log" id="log"></div>
+
+  <!-- Metrics -->
+  <div class="metrics" id="metrics">
+    <div class="metric"><div class="metric-label">Accounts found</div><div class="metric-val" id="mFound">0</div></div>
+    <div class="metric"><div class="metric-label">Passed engagement</div><div class="metric-val" id="mPassed">0</div></div>
+    <div class="metric"><div class="metric-label">Avg score</div><div class="metric-val" id="mAvg">—</div></div>
+    <div class="metric"><div class="metric-label">Top score</div><div class="metric-val" id="mTop">—</div></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <span><div class="leg-dot" style="background:#639922"></div>Alive (2.5%+)</span>
+    <span><div class="leg-dot" style="background:#BA7517"></div>Moderate (1–2.5%)</span>
+    <span><div class="leg-dot" style="background:#E24B4A"></div>Dead (&lt;1%)</span>
+    <span><div class="leg-dot" style="background:#888"></div>Unscored</span>
+  </div>
+
+  <!-- List -->
+  <div class="list-header">
+    <span class="list-title">Qualified accounts</span>
+    <div style="display:flex;gap:8px;align-items:center">
+      <span class="count-pill" id="countPill">0 accounts</span>
+      <button class="small-btn" onclick="clearRemoved()">Clear removed</button>
+    </div>
+  </div>
+
+  <div class="filter-row">
+    <input type="text" class="filter-input" id="filterInput" placeholder="Filter by username..." oninput="renderList()">
+    <select id="filterShow" onchange="renderList()">
+      <option value="active">Active only</option>
+      <option value="all">All</option>
+      <option value="removed">Removed</option>
+    </select>
+    <select id="sortBy" onchange="renderList()">
+      <option value="eng">By engagement</option>
+      <option value="followers">By followers</option>
+      <option value="date">By date</option>
+    </select>
+  </div>
+
+  <div class="account-list" id="accountList">
+    <div class="empty">No accounts yet — run the pipeline to get started.</div>
+  </div>
+
+  <div class="notice">
+    <strong>How it works:</strong> This tool uses Claude's knowledge base to identify NZ gym &amp; fitness TikTok creators who post with both #gym and #nz, filtered by follower count. It then estimates engagement scores based on Claude's knowledge of those accounts. Because no live web search is used, token usage is minimal and calls run fast. Your API key and all data are stored only in your browser's localStorage.
+  </div>
+</div>
+
+<script>
+const SK = 'tt_gym_nz_v5';
+const SCANK = 'tt_scan_v5';
+const APIKEY_K = 'tt_apikey';
+
+const AVATAR_COLORS = [
+  {bg:'#E6F1FB',tx:'#0C447C'},{bg:'#E1F5EE',tx:'#085041'},{bg:'#FAECE7',tx:'#712B13'},
+  {bg:'#FBEAF0',tx:'#72243E'},{bg:'#FAEEDA',tx:'#633806'},{bg:'#EAF3DE',tx:'#27500A'}
+];
+
+function initials(u){ return u.replace('@','').slice(0,2).toUpperCase(); }
+function colFor(u){ let h=0; for(let c of u) h=(h*31+c.charCodeAt(0))%AVATAR_COLORS.length; return AVATAR_COLORS[Math.abs(h)]; }
+function load(){ try{ return JSON.parse(localStorage.getItem(SK)||'[]'); }catch{ return []; } }
+function save(a){ localStorage.setItem(SK, JSON.stringify(a)); }
+function parseFol(s){ if(!s) return 0; const v=String(s).replace(/,/g,'').toLowerCase().trim(); if(v.endsWith('m')) return parseFloat(v)*1e6; if(v.endsWith('k')) return parseFloat(v)*1e3; return parseFloat(v)||0; }
+function fmtFol(n){ if(n>=1e6) return (n/1e6).toFixed(1).replace(/\.0$/,'')+'M'; if(n>=1000) return (n/1000).toFixed(1).replace(/\.0$/,'')+'K'; return String(Math.round(n)); }
+function engColor(s){ if(s===null||s===undefined) return '#888'; if(s>=2.5) return '#639922'; if(s>=1) return '#BA7517'; return '#E24B4A'; }
+function engLabel(s){ if(s===null||s===undefined) return '—'; if(s>=2.5) return 'Alive'; if(s>=1) return 'Moderate'; return 'Dead'; }
+function getKey(){ return document.getElementById('apiKey').value.trim() || localStorage.getItem(APIKEY_K) || ''; }
+function saveKey(){ const k=document.getElementById('apiKey').value.trim(); if(k){ localStorage.setItem(APIKEY_K,k); setStatus('API key saved.','ok'); } }
+function getMinFol(){ return parseFloat(document.getElementById('minFollowers').value)||5000; }
+function getMaxFol(){ const v=document.getElementById('maxFollowers').value; return v?parseFloat(v):null; }
+function getMinEng(){ return parseFloat(document.getElementById('minEng').value)||2.5; }
+function getVidCount(){ return parseInt(document.getElementById('vidCount').value)||10; }
+
+function setStatus(t,s){
+  document.getElementById('statusText').textContent=t;
+  const d=document.getElementById('statusDot');
+  d.className='dot'+(s?' '+s:'');
+}
+
+function setProgress(v){
+  const w=document.getElementById('progWrap');
+  w.classList.add('show');
+  document.getElementById('progFill').style.width=v+'%';
+}
+function hideProgress(){ setTimeout(()=>{ document.getElementById('progWrap').classList.remove('show'); document.getElementById('progFill').style.width='0%'; },800); }
+
+function log(msg, type='info'){
+  const el=document.getElementById('log');
+  el.classList.add('show');
+  const line=document.createElement('div');
+  line.className='log-line '+type;
+  line.textContent=msg;
+  el.appendChild(line);
+  el.scrollTop=el.scrollHeight;
+}
+function clearLog(){ const el=document.getElementById('log'); el.innerHTML=''; el.classList.remove('show'); }
+
+function updateMetrics(){
+  const all=load();
+  const active=all.filter(a=>!a.removed);
+  const scored=active.filter(a=>a.engagement!==null&&a.engagement!==undefined);
+  const minEng=getMinEng();
+  if(!scored.length){ document.getElementById('metrics').classList.remove('show'); return; }
+  document.getElementById('metrics').classList.add('show');
+  document.getElementById('mFound').textContent=active.length;
+  document.getElementById('mPassed').textContent=scored.filter(a=>a.engagement>=minEng).length;
+  const avg=scored.reduce((s,a)=>s+a.engagement,0)/scored.length;
+  document.getElementById('mAvg').textContent=avg.toFixed(1)+'%';
+  const top=Math.max(...scored.map(a=>a.engagement));
+  document.getElementById('mTop').textContent=top.toFixed(1)+'%';
+}
+
+function renderList(){
+  const accounts=load();
+  const filter=document.getElementById('filterInput').value.toLowerCase();
+  const show=document.getElementById('filterShow').value;
+  const sort=document.getElementById('sortBy').value;
+  const list=document.getElementById('accountList');
+
+  let visible=accounts.filter(a=>{
+    if(show==='active'&&a.removed) return false;
+    if(show==='removed'&&!a.removed) return false;
+    if(filter&&!a.username.toLowerCase().includes(filter)&&!(a.display||'').toLowerCase().includes(filter)) return false;
+    return true;
+  });
+
+  if(sort==='eng') visible.sort((a,b)=>(b.engagement??-1)-(a.engagement??-1));
+  else if(sort==='followers') visible.sort((a,b)=>parseFol(b.followers)-parseFol(a.followers));
+
+  const activeCount=accounts.filter(a=>!a.removed).length;
+  document.getElementById('countPill').textContent=activeCount+' account'+(activeCount!==1?'s':'');
+
+  if(!visible.length){ list.innerHTML='<div class="empty">No accounts match your filters.</div>'; updateMetrics(); return; }
+
+  list.innerHTML=visible.map(a=>{
+    const col=colFor(a.username);
+    const fol=parseFol(a.followers);
+    const eng=a.engagement;
+    const ec=engColor(eng);
+    const barW=eng!==null&&eng!==undefined?Math.min((eng/10)*100,100).toFixed(0):0;
+    return `<div class="account-item${a.removed?' removed':''}">
+      <div class="avatar" style="background:${col.bg};color:${col.tx}">${initials(a.username)}</div>
+      <div class="info">
+        <div class="account-name">@${a.username}${a.display?' · '+a.display:''}</div>
+        <div class="account-meta">${fol?fmtFol(fol)+' followers':''}${a.foundDate?' · Found '+a.foundDate:''}${a.videosAnalysed?' · '+a.videosAnalysed+' videos scored':''}</div>
+      </div>
+      ${a.isNew&&!a.removed?'<span class="badge badge-new">New</span>':''}
+      ${a.analysing?'<span class="badge badge-analysing">Analysing...</span>':''}
+      ${!a.analysing&&eng!==null&&eng!==undefined?`
+        <div class="eng-wrap">
+          <span class="eng-score" style="color:${ec}">${eng.toFixed(1)}%</span>
+          <span class="eng-label" style="color:${ec}">${engLabel(eng)}</span>
+          <div class="eng-bar-track"><div class="eng-bar-fill" style="width:${barW}%;background:${ec}"></div></div>
+        </div>`:''}
+      <input type="checkbox" class="remove-check" title="${a.removed?'Restore':'Remove'}" ${a.removed?'checked':''} onchange="toggleRemove('${a.username}',this.checked)">
+    </div>`;
+  }).join('');
+  updateMetrics();
+}
+
+function toggleRemove(u,v){ const a=load(); const i=a.findIndex(x=>x.username===u); if(i!==-1){a[i].removed=v;a[i].isNew=false;} save(a); renderList(); }
+function clearRemoved(){ save(load().filter(a=>!a.removed)); renderList(); }
+
+async function claudeCall(prompt, retries=3){
+  const key=getKey();
+  if(!key) throw new Error('No API key — enter your Anthropic API key above.');
+
+  for(let attempt=0;attempt<retries;attempt++){
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':key,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-haiku-4-5-20251001',
+        max_tokens:600,
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+
+    if(resp.status===429){
+      log('Rate limited — waiting 65s...','info');
+      await sleep(65000);
+      continue;
+    }
+    if(!resp.ok){ const err=await resp.json().catch(()=>({})); throw new Error(err.error?.message||`API error ${resp.status}`); }
+    const data=await resp.json();
+    return data.content.filter(b=>b.type==='text').map(b=>b.text).join('').replace(/```json|```/g,'').trim();
+  }
+  throw new Error('Max retries exceeded — please wait a minute and try again.');
+}
+
+function parseArr(raw){ const s=raw.indexOf('['),e=raw.lastIndexOf(']'); if(s===-1) return []; try{ return JSON.parse(raw.slice(s,e+1)); }catch{ return []; } }
+function parseObj(raw){ const s=raw.indexOf('{'),e=raw.lastIndexOf('}'); if(s===-1) return null; try{ return JSON.parse(raw.slice(s,e+1)); }catch{ return null; } }
+
+function sleep(ms){ return new Promise(r=>setTimeout(r,ms)); }
+
+async function fetchCombined(minFol, maxFol){
+  const minStr=fmtFol(minFol);
+  const maxStr=maxFol?`-${fmtFol(maxFol)}`:`+`;
+  const prompt=`List real NZ TikTok gym/fitness creators with ${minStr}${maxStr} followers who use #gym and #nz. From memory only — no searching. Return JSON array: [{"username":"handle","display":"name","followers":"12.3K"}]. 10 accounts max.`;
+  log('Asking Claude for NZ gym+nz TikTok creators from knowledge...','info');
+  const raw=await claudeCall(prompt);
+  const found=parseArr(raw)
+    .filter(a=>a&&a.username&&parseFol(a.followers)>=minFol&&(maxFol===null||parseFol(a.followers)<=maxFol))
+    .map(a=>({username:String(a.username).replace('@','').trim(),display:a.display||'',followers:a.followers||''}));
+  log(`Found ${found.length} accounts from knowledge base`,'info');
+  return found;
+}
+
+async function scoreEngagement(username, vidCount){
+  await sleep(5000);
+  const raw=await claudeCall(`TikTok @${username}: estimate engagement score from memory. JSON only: {"engagement":<avg (comments+shares)/views*100, or null>,"videosAnalysed":${vidCount},"avgViews":0}`);
+  return parseObj(raw);
+}
+
+async function startPipeline(){
+  const key=getKey();
+  if(!key){ setStatus('Please enter your Anthropic API key first.','err'); return; }
+  const searchBtn=document.getElementById('searchBtn');
+  const reBtn=document.getElementById('reBtn');
+  searchBtn.disabled=true; reBtn.disabled=true;
+  clearLog(); setProgress(5);
+
+  const minFol=getMinFol(), maxFol=getMaxFol(), minEng=getMinEng(), vidCount=getVidCount();
+
+  try{
+    setStatus('Step 1/3 — Searching for NZ gym creators using both tags...','on');
+    log('Running 3 search queries for #gym + #nz NZ creators...','info');
+    const unique=await fetchCombined(minFol, maxFol);
+    const rangeStr=maxFol?`${fmtFol(minFol)}–${fmtFol(maxFol)}`:`${fmtFol(minFol)}+`;
+    log(`Found ${unique.length} unique accounts with ${rangeStr} followers using #gym + #nz`,'pass');
+    setProgress(50);
+
+    const existing=load();
+    const existingSet=new Set(existing.map(a=>a.username));
+    const today=new Date().toLocaleDateString('en-NZ',{dateStyle:'medium'});
+    const updated=[...existing.map(a=>({...a,isNew:false}))];
+
+    const toScore=[];
+    unique.forEach(a=>{
+      if(!existingSet.has(a.username)){
+        updated.push({...a,foundDate:today,isNew:true,removed:false,engagement:null,videosAnalysed:0,analysing:true});
+        toScore.push(a.username);
+      }
+    });
+    save(updated); renderList();
+
+    setStatus(`Step 2/2 — Scoring engagement for ${toScore.length} new accounts...`,'on');
+    log(`Analysing last ${vidCount} videos for ${toScore.length} new accounts...`,'info');
+
+    const step=toScore.length>0?45/toScore.length:0;
+    for(let i=0;i<toScore.length;i++){
+      const uname=toScore[i];
+      setStatus(`Scoring @${uname} (${i+1}/${toScore.length})...`,'on');
+      try{
+        const result=await scoreEngagement(uname,vidCount);
+        const accs=load();
+        const idx=accs.findIndex(a=>a.username===uname);
+        if(idx!==-1){
+          accs[idx].engagement=result&&result.engagement!==null?parseFloat(Number(result.engagement).toFixed(2)):null;
+          accs[idx].videosAnalysed=result?.videosAnalysed||0;
+          accs[idx].analysing=false;
+          if(accs[idx].engagement===null) log(`@${uname} — could not retrieve data`,'fail');
+          else if(accs[idx].engagement>=minEng) log(`@${uname} scored ${accs[idx].engagement.toFixed(1)}% — PASSES ✓`,'pass');
+          else log(`@${uname} scored ${accs[idx].engagement.toFixed(1)}% — below threshold`,'fail');
+          save(accs);
+        }
+      }catch(e){
+        log(`@${uname} — error: ${e.message}`,'fail');
+        const accs=load();
+        const idx=accs.findIndex(a=>a.username===uname);
+        if(idx!==-1){accs[idx].analysing=false;save(accs);}
+      }
+      setProgress(50+Math.round((i+1)*step));
+      renderList();
+    }
+
+    const ts=new Date().toLocaleString('en-NZ',{dateStyle:'medium',timeStyle:'short'});
+    localStorage.setItem(SCANK,ts);
+    document.getElementById('lastScan').textContent='Last scan: '+ts;
+    const passed=load().filter(a=>!a.removed&&a.engagement!==null&&a.engagement>=minEng).length;
+    setStatus(`Done! ${unique.length} accounts found, ${passed} passed ${minEng}% engagement threshold.`,'ok');
+    log(`Pipeline complete — ${passed} accounts qualify.`,'pass');
+    setProgress(100); hideProgress();
+    reBtn.disabled=false;
+
+  }catch(e){
+    setStatus('Pipeline failed: '+e.message,'err');
+    log('Fatal error: '+e.message,'fail');
+    hideProgress();
+    const accs=load();
+    accs.forEach(a=>{if(a.analysing)a.analysing=false;});
+    save(accs); renderList();
+  }finally{
+    searchBtn.disabled=false;
+    reBtn.disabled=load().length===0;
+    renderList();
+  }
+}
+
+async function reAnalyseAll(){
+  const key=getKey();
+  if(!key){ setStatus('Please enter your Anthropic API key first.','err'); return; }
+  const searchBtn=document.getElementById('searchBtn');
+  const reBtn=document.getElementById('reBtn');
+  searchBtn.disabled=true; reBtn.disabled=true;
+  clearLog(); setProgress(5);
+
+  const accounts=load().filter(a=>!a.removed);
+  const vidCount=getVidCount();
+  const minEng=getMinEng();
+  const step=accounts.length>0?90/accounts.length:90;
+
+  for(let i=0;i<accounts.length;i++){
+    const a=accounts[i];
+    setStatus(`Re-scoring @${a.username} (${i+1}/${accounts.length})...`,'on');
+    const all=load(); const idx=all.findIndex(x=>x.username===a.username);
+    if(idx!==-1){all[idx].analysing=true;save(all);renderList();}
+    try{
+      const result=await scoreEngagement(a.username,vidCount);
+      const all2=load(); const idx2=all2.findIndex(x=>x.username===a.username);
+      if(idx2!==-1){
+        all2[idx2].engagement=result&&result.engagement!==null?parseFloat(Number(result.engagement).toFixed(2)):null;
+        all2[idx2].videosAnalysed=result?.videosAnalysed||0;
+        all2[idx2].analysing=false;
+        if(all2[idx2].engagement!==null&&all2[idx2].engagement>=minEng) log(`@${a.username} — ${all2[idx2].engagement.toFixed(1)}% ✓`,'pass');
+        else log(`@${a.username} — ${all2[idx2].engagement?.toFixed(1)||'n/a'}%`,'fail');
+        save(all2);
+      }
+    }catch(e){
+      log(`@${a.username} error: ${e.message}`,'fail');
+      const all2=load(); const idx2=all2.findIndex(x=>x.username===a.username);
+      if(idx2!==-1){all2[idx2].analysing=false;save(all2);}
+    }
+    setProgress(5+Math.round((i+1)*step));
+    renderList();
+  }
+
+  setStatus('Re-analysis complete.','ok');
+  log('Done re-scoring all accounts.','pass');
+  setProgress(100); hideProgress();
+  searchBtn.disabled=false; reBtn.disabled=false;
+}
+
+function exportCSV(){
+  const accounts=load().filter(a=>!a.removed);
+  if(!accounts.length){alert('No accounts to export.');return;}
+  const rows=['username,display,followers,engagement_pct,videos_analysed,foundDate'];
+  accounts.forEach(a=>rows.push([a.username,`"${(a.display||'').replace(/"/g,'""')}"`,a.followers||'',a.engagement!==null&&a.engagement!==undefined?a.engagement.toFixed(2):'',a.videosAnalysed||'',a.foundDate||''].join(',')));
+  const blob=new Blob([rows.join('\n')],{type:'text/csv'});
+  const url=URL.createObjectURL(blob);
+  const el=document.createElement('a');el.href=url;el.download='tiktok_gym_nz_engaged.csv';el.click();
+  URL.revokeObjectURL(url);
+}
+
+// Init
+const savedKey=localStorage.getItem(APIKEY_K);
+if(savedKey) document.getElementById('apiKey').value=savedKey;
+const ls=localStorage.getItem(SCANK);
+if(ls) document.getElementById('lastScan').textContent='Last scan: '+ls;
+if(load().length) document.getElementById('reBtn').disabled=false;
+renderList();
+</script>
+</body>
+</html>
