@@ -119,7 +119,7 @@ header nav li a:hover { color: #fff; opacity: 1; }
   transition: transform 0.3s, opacity 0.3s;
 }
 .nav-toggle.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
-.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(2) {   }
 .nav-toggle.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
 /* ── HERO ── */
@@ -203,6 +203,7 @@ header nav li a:hover { color: #fff; opacity: 1; }
   padding-bottom: 6vw;
   min-height: 80vh;
   background-color: #fff;
+  box-shadow: 0px 0px 10px black;
 }
 .items-row {
   display: flex;
@@ -941,7 +942,7 @@ footer {
   display: grid;
   grid-template-columns: 10vw 1px 1fr;
   gap: 0 3vw;
-  align-items: stretch;
+  align-items: stretch; 
   transform: translateX(-20px);
   transition: opacity 0.7s ease, transform 0.7s ease;
 }
@@ -1129,6 +1130,17 @@ footer {
   font-weight: 300;
   color: rgba(214,215,215,0.5);
   line-height: 1.8;
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateX(0);
 }
 
 /* ── STORY PAGE MOBILE ── */
