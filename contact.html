@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="rootstyle.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="logo.png">
+  <title>Contact, Roots</title>
+</head>
+<body>
+
+  <div id="progress-bar"></div>
+
+  <header>
+    <div class="header-inner">
+      <a href="index.html" class="header-logo">
+        <img src="logo.png" alt="Roots logo" class="header-logo-img">
+        <span>ROOTS</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <nav id="mainNav">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="ourstory.html">Our Story</a></li>
+        <li><a href="partnerships.html">Partnerships</a></li>
+        <li><a href="portfolio.html">Portfolio</a></li>
+        <li><a href="contact.html" class="nav-cta">Get in Touch</a></li>
+      </nav>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <div class="contact-hero">
+    <div class="contact-hero-content reveal">
+      <span class="section-label">Get in Touch</span>
+      <h1>Let's talk<br><em>connections.</em></h1>
+      <p>Whether you're a brand wanting to reach NZ's fitness audience, or a creator ready to work with brands that fit, we want to hear from you. No hard sell, just a conversation.</p>
+    </div>
+  </div>
+
+  <!-- MAIN CONTACT GRID -->
+  <div class="contact-grid">
+
+    <!-- FORM SIDE -->
+    <div class="contact-form-side reveal">
+      <span class="section-label">Send a Message</span>
+      <h2>Tell us about yourself.</h2>
+      <p class="contact-form-sub">Fill in the form and we'll get back to you within 48 hours. Tell us if you're a brand or creator and what you're looking for.</p>
+
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST" class="contact-form">
+        <div class="contact-field-row">
+          <div class="contact-field">
+            <label for="name">Your Name</label>
+            <input type="text" id="name" name="name" placeholder="e.g. Jordan Smith" required>
+          </div>
+          <div class="contact-field">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" placeholder="you@example.com" required>
+          </div>
+        </div>
+        <div class="contact-field">
+          <label for="type">I am a...</label>
+          <select id="type" name="type" required>
+            <option value="" disabled selected>Select one</option>
+            <option value="brand">Brand looking for creators</option>
+            <option value="creator">Creator looking for brand deals</option>
+            <option value="other">Something else</option>
+          </select>
+        </div>
+        <div class="contact-field">
+          <label for="message">Message</label>
+          <textarea id="message" name="message" rows="5" placeholder="Tell us a bit about you, your brand or channel, and what you're hoping to do..." required></textarea>
+        </div>
+        <button type="submit" class="contact-submit">Send Message →</button>
+        <p class="contact-form-note">We'll get back to you very quickly.</p>
+      </form>
+    </div>
+
+    <!-- INFO SIDE -->
+    <div class="contact-info-side reveal">
+
+      <div class="contact-info-block">
+        <span class="section-label">Direct Contact</span>
+        <a href="mailto:rootsconnectapp@gmail.com" class="contact-direct-link">
+          <div class="contact-direct-icon">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="2" y="4" width="20" height="16" rx="2" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M2 7l10 7 10-7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+          </div>
+          <div class="contact-direct-text">
+            <span class="contact-direct-label">Email us</span>
+            <span class="contact-direct-val">rootsconnectapp@gmail.com</span>
+          </div>
+        </a>
+      </div>
+
+      <div class="contact-info-block">
+        <span class="section-label">Follow Along</span>
+        <div class="contact-socials">
+
+          <a href="https://www.instagram.com/rootsconnects" target="_blank" class="contact-social-card">
+            <div class="contact-social-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="20" height="20" rx="5" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="12" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+                <circle cx="17.5" cy="6.5" r="1" fill="currentColor"/>
+              </svg>
+            </div>
+            <div class="contact-social-text">
+              <span class="contact-social-platform">Instagram</span>
+              <span class="contact-social-handle">@rootsconnects</span>
+            </div>
+            <span class="contact-social-arrow">↗</span>
+          </a>
+
+          <a href="https://www.tiktok.com/@rootsconnects" target="_blank" class="contact-social-card">
+            <div class="contact-social-icon">
+              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="contact-social-text">
+              <span class="contact-social-platform">TikTok</span>
+              <span class="contact-social-handle">@rootsconnects</span>
+            </div>
+            <span class="contact-social-arrow">↗</span>
+          </a>
+
+        </div>
+      </div>
+
+      <div class="contact-info-block contact-based-block">
+        <span class="section-label">Based In</span>
+        <div class="contact-based">
+          <div class="contact-based-row">
+            <span class="contact-based-name">Nixon Winger</span>
+            <span class="contact-based-loc">New Plymouth</span>
+          </div>
+          <div class="contact-based-row">
+            <span class="contact-based-name">Luke Singh</span>
+            <span class="contact-based-loc">Waiheke Island, Auckland</span>
+          </div>
+        </div>
+        <p class="contact-based-note">We're a remote team covering both ends of the North Island. Reach us anytime by email, we typically respond same day.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">
+        <img src="logo.png" alt="Roots" class="footer-logo-img">
+        <span>ROOTS</span>
+      </div>
+      <div class="footer-tagline">NZ Fitness, Creator Partnerships, 2026</div>
+      <nav class="footer-nav">
+        <a href="ourstory.html">Our Story</a>
+        <a href="partnerships.html">Partnerships</a>
+        <a href="portfolio.html">Portfolio</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script src="rootsjava.js"></script>
+</body>
+</html>
