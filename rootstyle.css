@@ -154,7 +154,7 @@ header nav li a:hover { color: #fff; opacity: 1; }
 .scroll-hint:hover { color: rgba(255,255,255,0.6); opacity: 1; }
 
 .tree-connector { position: relative; z-index: 10; pointer-events: none; height: 0; }
-.tree-top-img { position: absolute; left: 51%;  transform: translateX(-50%);  bottom: -580px;  width: 1600px;  height: 1100px; z-index: 10;}
+.tree-top-img { position: absolute; left: 51%;  transform: translateX(-50%);  bottom: -480px;  width: 1600px;  height: 1100px; z-index: 10;}
 
 .cards-section { background-color: #fff; background-size: cover; background-repeat: no-repeat; background-position: top center; overflow: hidden; padding-top: 1px; padding-bottom: 6vw; min-height: 80vh; position: relative; z-index: 1; }
 .cards-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0 3vw; margin-top: 28vw; gap: 2vw; }
